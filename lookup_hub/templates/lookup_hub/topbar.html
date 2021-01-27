@@ -18,6 +18,14 @@
 
 <div id="topbar-filler"></div>
 
+
+{% if show_connected_tab %}
+<a class="topbar-tab topbar-button">
+    <i id="socket-status" class="fas fa-link"></i>
+    <span></span>
+</a>
+{% endif %}
+
 {% if user.is_authenticated %}
     {% if user.is_superuser %}
         <a href="/admin" class="topbar-tab topbar-button">

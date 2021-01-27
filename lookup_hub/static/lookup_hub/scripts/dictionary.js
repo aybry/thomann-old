@@ -1,3 +1,78 @@
+var dictionary;
+
+
+class Dictionary {
+    constructor() {
+        this.categories = [];
+    }
+
+    initialise(data) {
+        for (var cat of dictionaryData) {
+            // for (var i = 0; i < 10; i++) {
+                var category = new Category(cat);
+                this.categories.push(category);
+                category.makeTbody();
+            // }
+        }
+    }
+
+    // insertDataByID(id, entry) {
+    //     var index = this.ids.indexOf(id);
+    //     this.insertDataByIndex(index, entry);
+
+    //     this.displayRowByID(id, entry);
+    // }
+
+    // insertDataByIndex(index, entry) {
+    //     this.entries.splice(index, 0, entry);
+    //     this.ids.splice(index, 0, entry.id);
+    // }
+
+    // displayRowByID(id, entry) {
+    //     $(entry.html).insertBefore($("[data-row-id='" + id + "']")[0]);
+    // }
+
+    // displayRowByIndex(entry, index) {
+    //     var id = this.ids[index];
+    //     this.displayRowByID(entry, id);
+    // }
+
+    // remove(entryID) {
+    //     var index = this.ids.indexOf(entryID);
+
+    //     this.ids.splice(index, 1);
+    //     this.entries.splice(index, 1);
+
+    //     $("[data-row-id='" + entryID + "']").remove();
+    // }
+
+    undo() {
+        if (
+            lastDeleteNeighbourIDs().length > 0 &&
+            lastDeleted().length > 0 &&
+            lastDeleteNeighbourIDs().length == lastDeleted().length
+        ) {
+            sockAddRowID(popFromSession("lastDeleteNeighbourIDs"), popFromSession("lastDeleted"));
+        }
+
+        if (
+            lastDeleteNeighbourIDs().length == 0 &
+            lastDeleted().length == 0
+        ) {
+            $("#undo-button").prop("disabled", true);
+        }
+    }
+
+    // replace(entry) {
+    //     var index = this.ids.indexOf(entry.id);
+    //     this.entries[index] = entry;
+
+    //     $(".hub-entry[data-row-id='" + entry.id + "']").remove();
+    //     $(dictionaryElemsHTML(entry)).insertAfter($("tr[data-row-id='" + entry.id + "']").children()[1]);
+    // }
+}
+
+
 class Category {
     constructor(data) {
         this.id = data.id;
@@ -15,19 +90,35 @@ class Category {
         return catRows;
     }
 
-    makeTable() {
+    makeTbody() {
         var container = $(this.containerHTML);
         for (var row of this.rows) {
             container.append(row.jq);
         }
+        container.append(this.lastRowJQ);
         container.append($("<tr class='spacer-row'><td></td></tr>"));
         $("#hub-table").append(container);
     }
 
+    get lastRowJQ() {
+        return $(`<tr data-cat-id="${this.id}">
+            <td></td>
+            <td class="buttons-left">
+                <button
+                    class="pure-button dictionary-button"
+                    data-row-key="-1"
+                    title="Insert new row here"
+                    onclick="sockAppendRow('${this.id}');">
+                    <i class="fa fa-plus-square fa-lg"></i>
+                </button>
+            </td>
+        </tr>`)
+    }
+
     get containerHTML() {
         return `
-        <tbody class="cat-container" data-cat-name="${escapeHTML(this.name)}">
-            <tr>
+        <tbody class="cat-container" data-cat-id="${escapeHTML(this.id)}">
+            <tr class="cat-header-row">
                 <td class="filler"></td>
                 <td class="filler"></td>
                 <th colspan="3" class="cat-header">${escapeHTML(this.name)}</th>
@@ -42,9 +133,14 @@ class Row {
     constructor(data) {
         this.id = data.id;
 
+        // print('Row')
+        // print(data)
+
         this.en = new Cell("en", data.cell_set.filter(cell => {return cell.language == "en"})[0]);
         this.de = new Cell("de", data.cell_set.filter(cell => {return cell.language == "de"})[0]);
         this.nl = new Cell("nl", data.cell_set.filter(cell => {return cell.language == "nl"})[0]);
+
+        this.cells = [this.en, this.de, this.nl];
 
         this.pureJSON = data;
 
@@ -101,6 +197,9 @@ class Cell {
     constructor(language, data) {
         this.language = language;
 
+        // print('Cell')
+        // print(data)
+
         if (typeof(data) === "undefined") {
             this.initialise();
         } else {
@@ -111,21 +210,19 @@ class Cell {
         }
     }
 
+    getattr(attribute) {
+        if (attribute === "id") { return this.id; }
+        else if (attribute === "text") { return this.text; }
+        else if (attribute === "comment") { return this.comment; }
+        else if (attribute === "colour") { return this.colour; }
+        else { return null }
+    }
+
     initialise() {
         this.id = "";
         this.text = "";
         this.comment = "";
         this.colour = "";
-    }
-}
-
-
-function createDictionaryTable() {
-    for (var cat of dictionaryData) {
-        for (var i = 0; i < 10; i++) {
-            var category = new Category(cat);
-            category.makeTable();
-        }
     }
 }
 
@@ -152,7 +249,7 @@ const leftButtonsHTML = (row) => `
             class="pure-button dictionary-button"
             title="Delete this row"
             data-key="${ row.id }"
-            onclick="deleteRow('${ row.id }');">
+            onclick="sockDeleteRow('${ row.id }');">
             <i class="fa fa-minus-square fa-lg"></i>
         </button>
     </td>
@@ -161,7 +258,7 @@ const leftButtonsHTML = (row) => `
             class="pure-button dictionary-button"
             title="Insert new row here"
             data-key="${ row.id }"
-            onclick="insertNewRow('${ row.id }');">
+            onclick="sockInsertRow('${ row.id }');">
             <i class="fa fa-plus-square fa-lg"></i>
         </button>
     </td>
@@ -212,7 +309,7 @@ const rightButtonsHTML = (row) => `
             class="pure-button dictionary-button"
             title="Edit this row"
             data-key="${ row.id }"
-            onclick="getRow('${ row.id }');">
+            onclick="sockGetRow('${ row.id }');">
             <i class="fa fa-pencil-square fa-lg"></i>
         </button>
     </td>
@@ -268,7 +365,8 @@ $(document).keydown(function(event) {
 
 $(document).ready( function() {
 
-    createDictionaryTable()
+    dictionary = new Dictionary();
+    dictionary.initialise();
 
     initSession();
     $("#undo-button").prop("disabled", true);

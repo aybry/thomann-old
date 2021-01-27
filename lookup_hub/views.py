@@ -12,15 +12,14 @@ class HomeView(TemplateView):
 class HubView(LoginRequiredMixin, TemplateView):
     template_name = 'lookup_hub/hub.html'
 
-
     def get_context_data(self, **kwargs):
+        hub_dictionary = models.Dictionary.objects.get(name='hub')
         dictionary_data = serialisers.CategorySerialiser(
-                            models.Category.objects.all(),
+                            models.Category.objects.filter(dictionary=hub_dictionary),
                             many=True)
         return {
+            'show_connected_tab': True,
             'dictionary_data': dictionary_data.data,
-            'row_form': forms.RowForm,
-            'cell_form': forms.CellForm,
         }
 
 
@@ -28,8 +27,13 @@ class SandboxView(TemplateView):
     template_name = 'lookup_hub/hub.html'
 
     def get_context_data(self, **kwargs):
+        sandbox_dictionary = models.Dictionary.objects.get(name='sandbox')
+        dictionary_data = serialisers.CategorySerialiser(
+                            models.Category.objects.filter(dictionary=sandbox_dictionary),
+                            many=True)
         return {
-            # 'dictionary_data': dummy_dictionary
+            'show_connected_tab': True,
+            'dictionary_data': dictionary_data.data,
         }
 
 

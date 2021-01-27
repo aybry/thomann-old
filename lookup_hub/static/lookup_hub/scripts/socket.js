@@ -4,21 +4,6 @@ var currentEntry;
 var dummyPage = window.location.pathname == "/sandbox";
 
 
-function insertNewRow(rowID) {
-    socket.send(JSON.stringify({
-        'method':'insert_new_row',
-        'args': [rowID],
-    }))
-}
-
-
-function deleteRow(rowID) {
-    socket.send(JSON.stringify({
-        'method':'delete_row',
-        'args': [rowID],
-    }))
-}
-
 
 function startSocket() {
     var wsURL = "ws://"
@@ -30,81 +15,85 @@ function startSocket() {
 
     socket.onopen = function() {
         print('yay')
+        $("#socket-status").parent().children("span").text("Connected");
+        $("#socket-status")
+            .removeClass("disconnected")
+            .addClass("connected");
     }
 
-    socket.onmessage = function(e) {
-        print(e)
-        const data = JSON.parse(e.data);
+    socket.onclose = function() {
+        socket = null
+        $("#socket-status").parent().children("span").text("Disconnected");
+        $("#socket-status")
+            .removeClass("connected")
+            .addClass("disconnected");
+        console.error('Socket closed unexpectedly. Retrying...');
+
+        print('Trying to connect...')
+        setTimeout(startSocket, 1000);
+    }
+
+    socket.onmessage = function(event) {
+        var data = JSON.parse(event.data);
         print(data)
+
+        if (data["action"] == "remove_row") {
+            removeRow(data["row_id"]);
+        } else if (data["action"] == "insert_row") {
+            insertRow(data["row_data"], data["neighbours"]);
+        } else if (data["action"] == "fetched_row_data") {
+            var row = new Row(data["row_data"]);
+            showEditWindow(row);
+        } else if (data["action"] == "updated_row") {
+            var row = new Row(data["row_data"]);
+            removeRow(row.id);
+            insertRow(data["row_data"], data["neighbours"]);
+        }
     };
+}
 
-    socket.onclose = function(e) {
-        console.error('Socket closed unexpectedly');
-    };
 
-    // socket.on("pong", () => {
-    //     $("#socket-status").text("Connected").removeClass("disconnected").addClass("connected");
-    // })
+function sockInsertRow(rowID) {
+    socket.send(JSON.stringify({
+        'method':'insert_new_row',
+        'args': [rowID],
+    }))
+}
 
-    // socket.on("disconnect", () => {
-    //     $("#socket-status").text("Disconnected").removeClass("connected").addClass("disconnected");
-    // })
 
-    // socket.on("got_entry", data => {
-    //     currentEntry = data["entry_id"];
-    //     showEditWindow(data);
-    // })
+function sockDeleteRow(rowID) {
+    socket.send(JSON.stringify({
+        'method':'delete_row',
+        'args': [rowID],
+    }))
+    // function sockRemoveRow(elemID) {
+    //     var index = dictionary.ids.indexOf(elemID)
+    //     pushToSession("lastDeleted", dictionary.entries[index].pureJSON);
+    //     pushToSession("lastDeleteNeighbourIDs", dictionary.ids[index + 1]);
 
-    // socket.on("updated_entry", (data) => {
-    //     var entry = new Row(data["new_entry"])
+    //     dictionary.remove(elemID);
 
-    //     dictionary.replace(entry)
-    // })
-
-    // socket.on("new_row", (data) => {
-    //     var atID = data["entry_id"];
-    //     var entry = new Row(data["new_entry"]);
-    //     if (atID == null) {
-    //         dictionary.appendRow(entry);
-    //     } else {
-    //         dictionary.insertDataByID(atID, entry);
+    //     var data = {
+    //         dummy: dummyPage,
+    //         entry_id: elemID,
     //     }
-    // })
 
-    // socket.on("new_row_append", (data) => {
-    //     var entry = new Row(data["new_entry"]);
-    //     dictionary.appendRow(entry);
-    // })
+    //     $("#undo-button").prop("disabled", false);
 
-    // socket.on("removed_row", (data) => {
-    //     var atID = data["entry_id"];
-    //     dictionary.remove(atID);
-    // })
+    //     socket.emit("remove_row", data);
+    // }
 }
 
 
-function updateDictionary(entryID, data) {
-    findEntryElem(entryID, "de").text(data["new_entry"]["de"]["text"]);
-    findEntryElem(entryID, "en").text(data["new_entry"]["en"]["text"]);
-    findEntryElem(entryID, "nl").text(data["new_entry"]["nl"]["text"]);
+function sockAppendRow(catID) {
+    socket.send(JSON.stringify({
+        'method':'append_row',
+        'args': [catID],
+    }))
 }
 
 
-
-function findEntryElem(entryID, targLang) {
-    var allMatches = $("[data-key='" + entryID + "']");
-
-    if (targLang === undefined) {
-        return allMatches;
-    } else {
-        return allMatches.filter( function() {
-            return $(this).attr('data-target-language') == targLang;
-        });
-    }
-}
-
-
-function getRow(rowID) {
+function sockGetRow(rowID) {
     var data = {
         dummy: dummyPage,
         method: 'fetch_row_data',
@@ -115,22 +104,75 @@ function getRow(rowID) {
 }
 
 
-function showEditWindow(data) {
-    showPopup('edit-row-cells-form');
-    $("#edit-entry-grid").css("display", "grid");
-    for (lang of ["en", "de", "nl"]) {
+function sockUpdateRow(rowData, rowID) {
+    socket.send(JSON.stringify({
+        dummy: dummyPage,
+        method: "update_row",
+        args: [
+            rowID,
+            rowData,
+        ]
+    }));
+}
+
+
+function submitChanges() {
+    rowID = $("#row-id").text();
+
+    rowData = {}
+    for (lang of ['en', 'de', 'nl']) {
+        rowData[lang] = {
+            id: $(`#text-${lang}`).attr("data-cell-id"),
+            text: $(`#text-${lang}`).val(),
+            comment: nullIfEmpty($(`#comment-${lang}`).val()),
+            colour: $(`#colour-${lang}`).val(),
+            language: lang,
+        }
+    }
+
+    sockUpdateRow(rowData, rowID);
+}
+
+
+function insertRow(rowData, neighbourRowIDs) {
+    var newRow = new Row(rowData);
+    if (neighbourRowIDs[0] !== null) {
+        var rowBefore = getRowElementByID(neighbourRowIDs[0]);
+        newRow.jq.insertAfter(rowBefore);
+    } else if (neighbourRowIDs[1] !== null) {
+        var rowAfter = getRowElementByID(neighbourRowIDs[1]);
+        newRow.jq.insertBefore(rowAfter);
+    } else {
+        var headerRow = $(`.cat-container[data-cat-id='${rowData.category.id}'] > .cat-header-row`);
+        newRow.jq.insertAfter(headerRow);
+    }
+}
+
+
+function removeRow(rowID) {
+    getRowElementByID(rowID).remove();
+}
+
+
+
+function getRowElementByID(rowID) {
+    return $(`tr[data-row-id='${rowID}']`);
+}
+
+
+function showEditWindow(row) {
+    $("#row-id").text(row.id);
+    for (var cell of row.cells) {
+        $(`#text-${cell.language}`).attr("data-cell-id", cell.id);
         for (item of ["text", "comment", "colour"]) {
-            try {
-                // if (item == "colour" && data["entry"][lang][item] === undefined) {
-                //     $("#" + item + "-" + lang).val("#FFFFFF");
-                // } else {
-                //     $("#" + item + "-" + lang).val(data["entry"][lang][item]);
-                // }
-            } catch(error) {
-                print(error);
+            if (item == "colour" && cell.colour === null) {
+                $("#" + item + "-" + cell.language).val("");
+            } else {
+                $("#" + item + "-" + cell.language).val(cell.getattr(item));
             }
         }
     }
+    showPopup('edit-row-cells-form');
 }
 
 
@@ -140,81 +182,6 @@ function nullIfEmpty(string) {
     } else {
         return String(string);
     }
-}
-
-
-function submitChanges() {
-    entryData = {
-        en: {
-            text: $("#text-en").val(),
-            comment: nullIfEmpty($("#comment-en").val()),
-            colour: $("#colour-en").val(),
-        },
-        de: {
-            text: $("#text-de").val(),
-            comment: nullIfEmpty($("#comment-de").val()),
-            colour: $("#colour-de").val(),
-        },
-        nl: {
-            text: $("#text-nl").val(),
-            comment: nullIfEmpty($("#comment-nl").val()),
-            colour: $("#colour-nl").val(),
-        },
-    }
-
-    sockEditEntry(entryData, currentEntry);
-}
-
-
-function sockEditEntry(entryData, entryID) {
-
-    var data = {
-        dummy: dummyPage,
-        entry_id: entryID,
-        new_entry: entryData,
-    }
-
-    socket.emit("update_entry", data);
-}
-
-
-function sockRemoveRow(elemID) {
-    var index = dictionary.ids.indexOf(elemID)
-    pushToSession("lastDeleted", dictionary.entries[index].pureJSON);
-    pushToSession("lastDeleteNeighbourIDs", dictionary.ids[index + 1]);
-
-    dictionary.remove(elemID);
-
-    var data = {
-        dummy: dummyPage,
-        entry_id: elemID,
-    }
-
-    $("#undo-button").prop("disabled", false);
-
-    socket.emit("remove_row", data);
-}
-
-
-function sockAddRowID(elemID, contents) {
-    var data = {
-        dummy: dummyPage,
-        at_id: elemID,
-        contents: contents,
-    }
-
-    socket.emit("new_row_by_id", data);
-}
-
-
-function sockAddRowIndex(elemIndex, contents) {
-    var data = {
-        dummy: dummyPage,
-        at_index: elemIndex,
-        contents: contents,
-    }
-
-    socket.emit("new_row_by_index", data);
 }
 
 

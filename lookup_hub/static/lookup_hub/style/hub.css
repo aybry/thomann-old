@@ -91,11 +91,11 @@ tbody.cat-container > tr {
 
 
 .disconnected {
-    color: red;
+    color: var(--darkred);
 }
 
 .connected {
-    color: green;
+    color: var(--darkgreen);
 }
 
 /*
@@ -119,7 +119,7 @@ tbody.cat-container > tr {
     max-width: 1500px;
     /* margin: 30vh auto auto; */
     /* padding: 40px; */
-    display: none;
+    display: grid;
 }
 
 .edit-entry-grid-elem {

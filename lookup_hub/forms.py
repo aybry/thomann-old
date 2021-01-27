@@ -17,13 +17,10 @@ class RowForm(forms.ModelForm):
 class CellForm(forms.ModelForm):
     class Meta:
         model = models.Cell
-
         fields = (
+            'language',
             'text',
             'comment',
             'colour',
+            'row',
         )
-
-        widgets = {
-            'comment': forms.Textarea,
-        }

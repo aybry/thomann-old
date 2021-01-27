@@ -15,14 +15,25 @@ class CellSerialiser(serializers.ModelSerializer):
         )
 
 
+class CategoryBarebonesSerialiser(serializers.ModelSerializer):
+    class Meta:
+        model = models.Category
+        fields = (
+            'id',
+            'name',
+            'order',
+        )
+
+
 class RowSerialiser(serializers.ModelSerializer):
     cell_set = CellSerialiser(many=True)
+    category = CategoryBarebonesSerialiser()
 
     class Meta:
         model = models.Row
         fields = (
             'id',
-            # 'order',
+            'order',
             'category',
             'cell_set'
         )
@@ -37,5 +48,5 @@ class CategorySerialiser(serializers.ModelSerializer):
             'id',
             'name',
             'row_set',
-            # 'order',
+            'order',
         )

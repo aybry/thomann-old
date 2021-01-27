@@ -30,61 +30,6 @@
 {% endblock %}
 
 {% block body %}
-    <!-- <div id="popup-container">
-        <div id="edit-entry-grid">
-            <div class="edit-entry-header edit-entry-grid-elem header-de">
-                DE
-            </div>
-            <div class="edit-entry-header edit-entry-grid-elem header-en">
-                EN
-            </div>
-            <div class="edit-entry-header edit-entry-grid-elem header-nl">
-                NL
-            </div>
-
-            <div class="edit-entry-row edit-entry-grid-elem row-de">
-                <input type="text" name="text-de" id="text-de">
-            </div>
-            <div class="edit-entry-row edit-entry-grid-elem row-en">
-                <input type="text" name="text-en" id="text-en">
-            </div>
-            <div class="edit-entry-row edit-entry-grid-elem row-nl">
-                <input type="text" name="text-nl" id="text-nl">
-            </div>
-
-            <div class="edit-entry-row edit-entry-grid-elem row-de">
-                <textarea name="comment-de" id="comment-de" rows="10"></textarea>
-            </div>
-            <div class="edit-entry-row edit-entry-grid-elem row-en">
-                <textarea name="comment-en" id="comment-en" rows="10"></textarea>
-            </div>
-            <div class="edit-entry-row edit-entry-grid-elem row-nl">
-                <textarea name="comment-nl" id="comment-nl" rows="10"></textarea>
-            </div>
-
-            <div class="edit-entry-row edit-entry-grid-elem row-de">
-                <input type="color" id="colour-de" value="#FFFFFF">
-            </div>
-            <div class="edit-entry-row edit-entry-grid-elem row-en">
-                <input type="color" id="colour-en" value="#FFFFFF">
-            </div>
-            <div class="edit-entry-row edit-entry-grid-elem row-nl">
-                <input type="color" id="colour-nl" value="#FFFFFF">
-            </div>
-
-            <div class="edit-entry-row edit-entry-grid-elem row-de"></div>
-            <div class="edit-entry-row edit-entry-grid-elem row-en">
-                <input type="checkbox"> This entry is a category header
-            </div>
-            <div class="edit-entry-row edit-entry-grid-elem row-nl"></div>
-
-            <div id="submit-entry-row" class="button-row">
-                <button class="pure-button" id="submit-entry-button">Submit</button>
-                <button class="pure-button" onclick="$('#popup-container').hide();">Cancel</button>
-            </div>
-        </div>
-    </div> -->
-
     <table id="hub-table">
         <thead class="grid-elem de">
             <th></th>
@@ -105,6 +50,7 @@
 
 {% block popups %}
 <div class="popup" id="edit-row-cells-form">
+    <p>Row ID: <span id="row-id"></span></p>
     <div id="edit-entry-grid">
         <div class="edit-entry-header edit-entry-grid-elem header-de">
             DE
