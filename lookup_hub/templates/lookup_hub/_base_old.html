@@ -1,0 +1,55 @@
+<!doctype html>
+
+<head>
+    <link rel="stylesheet" href="{% static 'lookup_hub/style/main.css' %}">
+    <link rel="stylesheet" href="{% static 'lookup_hub/style/vars.css' %}">
+    <!-- <link rel="stylesheet" src="{% static 'lookup_hub/lib/font-awesome.min.css' %}"> -->
+    <link rel="stylesheet" href="{% static 'lookup_hub/lib/pure-min.css' %}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    {% block styles %} {% endblock %}
+    <script src="{% static 'lookup_hub/scripts/tools.js' %}"></script>
+    <script src="{% static 'lookup_hub/lib/jquery-3.5.1.min.js' %}"></script>
+    <!-- <script src="{% static 'lookup_hub/lib/socket.io.js' %}"></script> -->
+    <!-- <script src="https://kit.fontawesome.com/33027f249b.js" crossorigin="anonymous"></script> -->
+    {% block scripts %} {% endblock %}
+</head>
+
+<body>
+    <div id="navigator-div" class="button-row">
+        <div>
+            <a href="/">
+                <button class="pure-button">Home</button>
+            </a>
+        </div>
+        <div>
+            <a href="/hub">
+                <button class="pure-button">Lookup Hub</button>
+            </a>
+        </div>
+            <a>
+                <button class="pure-button" disabled>Mistakes</button>
+            </a>
+        <div>
+            <a href="/sandbox">
+                <button class="pure-button">Sandbox</button>
+            </a>
+        </div>
+        <div>
+            <a href="/guide">
+                <button class="pure-button">Help</button>
+            </a>
+        </div>
+        <!-- <a href="/documents">
+            <button class="pure-button" disabled>Documents</button>
+        </a> -->
+
+        <div id="navigator-filler"></div>
+
+        {% block right_buttons %} {% endblock %}
+    </div>
+
+    <div id="content-main">
+        {% block content %}
+        {% endblock %}
+    </div>
+</body>

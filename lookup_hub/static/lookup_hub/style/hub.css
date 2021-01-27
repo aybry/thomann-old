@@ -1,0 +1,165 @@
+
+#hub-table {
+    /* min-width: 900px; */
+    width: 80%;
+    max-width: 100%;
+    margin: auto;
+    border-spacing: 4px;
+}
+
+#hub-table th, #hub-table td {
+    border-radius: 3px;
+}
+
+#hub-table td.text-cell {
+    background-color: var(--object-list-box-bg);
+}
+
+#hub-table td.filler {
+    opacity: 0;
+}
+
+#hub-table th {
+    height: 50px;
+    font-size: larger;
+}
+/*
+tbody.cat-container > tr {
+    padding-top: 20px;
+} */
+
+.spacer-row {
+    height: 20px;
+}
+
+#hub-table th.cat-header {
+    background-color: var(--object-list-box-bg);
+    height: 40px;
+}
+
+#hub-table .text-cell {
+    min-width: 300px;
+    width: 30%;
+    max-width: 450px;
+}
+
+.grid-elem {
+    border-radius: 3px;
+    min-height: 30px;
+}
+
+.hub-header {
+    background-color: rgb(39, 38, 35);
+    padding: 14px;
+    text-align: center;
+    font-weight: bold;
+}
+
+.hub-entry {
+    padding: 7px;
+    background-color: var(--off-white);
+}
+
+.hub-entry-text {
+    display: inline;
+}
+
+.entry-comment {
+    float: right;
+    opacity: 50%;
+}
+
+.buttons-left, .buttons-right {
+    width: 10px;
+}
+
+.buttons-left button, .buttons-right button {
+    opacity: 0.5;
+}
+
+.dictionary-button:hover .fa-minus-square {
+    color: rgb(184, 0, 0);
+}
+
+.dictionary-button:hover .fa-plus-square {
+    color: green;
+}
+
+.dictionary-button:hover .fa-pencil-square {
+    color: rgb(218, 185, 0);
+}
+
+
+.disconnected {
+    color: red;
+}
+
+.connected {
+    color: green;
+}
+
+/*
+#popup-container {
+    background-color: rgba(128, 128, 128, 0.5);
+    position: fixed;
+    display: none;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 10;
+} */
+
+#edit-entry-grid {
+    /* background-color: rgb(31, 106, 116); */
+    width: 100%;
+    grid-template-columns: 1fr 1fr 1fr;
+    grid-gap: 10px;
+    min-width: 900px;
+    max-width: 1500px;
+    /* margin: 30vh auto auto; */
+    /* padding: 40px; */
+    display: none;
+}
+
+.edit-entry-grid-elem {
+    width: 100%;
+}
+
+input[type="color"] {
+    width: 20%;
+    height: 30px;
+    margin: 0 40% 24px;
+}
+
+.edit-entry-header {
+    text-align: center;
+    margin: auto;
+    font-size: larger;
+    color: var(--off-white);
+}
+
+.edit-entry-row {
+    margin: auto;
+    align-content: center;
+}
+
+.edit-entry-row input[type="text"], .edit-entry-row textarea {
+    width: 100%;
+}
+
+.edit-entry-row textarea {
+    resize: none;
+}
+
+
+#submit-entry-row {
+    grid-column: 2;
+    width: 100%;
+}
+
+#submit-entry-row button {
+    width: 30%;
+    display: block;
+    margin: auto;
+}

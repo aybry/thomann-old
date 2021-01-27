@@ -1,0 +1,41 @@
+
+<a href="/" class="topbar-tab topbar-button">
+    <i class="fas fa-home"></i>
+    Home
+</a>
+<a href="/hub" class="topbar-tab topbar-button">
+    <i class="fas fa-th-list"></i>
+    Hub
+</a>
+<a href="/sandbox" class="topbar-tab topbar-button">
+    <i class="fas fa-chalkboard"></i>
+    Sandbox
+</a>
+<a href="/guide" class="topbar-tab topbar-button">
+    <i class="fas fa-info"></i>
+    Guide
+</a>
+
+<div id="topbar-filler"></div>
+
+{% if user.is_authenticated %}
+    {% if user.is_superuser %}
+        <a href="/admin" class="topbar-tab topbar-button">
+            <i class="fas fa-user-shield"></i>
+        </a>
+    {% endif %}
+    <!-- <a href="/user" class="topbar-tab topbar-button">
+        <i class="fas fa-user"></i>
+        {{ user.username }}
+    </a> -->
+    <a href="/logout" class="topbar-tab topbar-button topbar-rightmost">
+        <i class="fas fa-sign-out-alt"></i>
+        <!-- Log out -->
+    </a>
+
+{% else %}
+    <a href="/login" class="topbar-tab topbar-button topbar-rightmost">
+        <i class="fas fa-sign-in-alt"></i>
+        <!-- Log in -->
+    </a>
+{% endif %}

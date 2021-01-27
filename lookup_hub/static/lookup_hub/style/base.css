@@ -1,0 +1,153 @@
+* {
+    box-sizing: border-box;
+    color: var(--text-default);
+}
+
+html, body {
+    background-color: var(--page-bg);
+    margin: 0;
+}
+
+body {
+    font-family: "Roboto", sans-serif;
+    font-weight: 400;
+    min-height: 100vh;
+    width: 100vw;
+    max-width: 100%;
+    padding-bottom: 10px;
+}
+
+a:link, a:visited,
+a:link > i, a:visited > i {
+    color: var(--link);
+    text-decoration: none;
+}
+
+a:link:hover, a:hover,
+a:link:hover > i {
+    color: var(--link-hover);
+    transition: background-color .1s ease;
+}
+
+#grid-container {
+    display: grid;
+    grid-template-columns: auto minmax(80%, 1200px) auto;
+    padding-top: 74px;
+    grid-gap: 12px;
+    min-height: 86vh;
+}
+
+#grid-container > div {
+    background-color: var(--grid-elem-bg);
+    border-radius: 4px;
+}
+
+#grid-body {
+    grid-column: 2 / 3;
+    height: 100%;
+    min-height: 80vh;
+}
+
+/* #grid-footer {
+    grid-column: 2 / 3;
+    grid-row: 3 / 4;
+    padding: 10px;
+} */
+
+#grid-body > header {
+    background-color: var(--grid-elem-header-bg);
+    color: var(--grid-elem-header-text);
+    border-style: solid;
+    border-color: var(--grid-elem-header-border);
+    border-width: 1px 0 2px 0;
+    padding: 8px 4px;
+    text-align: center;
+    font-size: larger;
+    border-radius: 4px 4px 0 0;
+    font-weight: 500;
+    margin: 0;
+}
+
+#grid-body > main {
+    overflow-y: auto;
+}
+
+.fa-large {
+    font-size: x-large;
+}
+
+.bot-active-icon {
+    color: var(--darkgreen);
+}
+
+.bot-inactive-icon {
+    color: rgb(116, 116, 116);
+}
+
+i.right-aligned {
+    display: absolute;
+    right: 0;
+}
+
+.fa-symbol-spacer {
+    display: inline-block;
+    width: 4px;
+}
+
+#popup-container {
+    z-index: 999;
+    position: fixed;
+    width: 100vw;
+    height: 100vh;
+    background-color: var(--popup-container-bg);
+}
+
+#popup-container > div {
+	border-radius: 10px;
+	border: 10px solid var(--popup-border);
+	background-color: var(--popup-bg);
+	min-width: 500px;
+	margin: 10vw auto auto;
+	padding: 50px;
+	width: 60%;
+	max-width: 80%;
+}
+
+button,
+input,
+textarea,
+select {
+    border: 0;
+    border-radius: 5px;
+    padding: 8px 14px;
+    background-color: var(--button-input-select-bg);
+    max-width: 100%;
+}
+
+button:hover,
+input[type="submit"]:hover,
+input[type="button"]:hover {
+    cursor: pointer;
+    background-color: var(--button-input-select-bg-hover);
+    transition: background-color .1s ease;
+}
+
+.symbol-clickable {
+    padding: 1px 4px;
+}
+
+.symbol-clickable:hover {
+    cursor: pointer;
+    background-color: rgba(255, 255, 255, 0.041);
+    transition: background-color .1s ease;
+}
+
+
+.warning-button {
+    border: 1px solid var(--darkred);
+    background-color: var(--warning-bg);
+}
+
+.warning-button:hover {
+    background-color: var(--warning-bg-hover);
+}

@@ -1,0 +1,42 @@
+#topbar {
+    display: flex;
+    padding: 8px;
+    width: 100%;
+    position: fixed;
+    background-color: var(--grid-elem-bg);
+    border-radius: 4px;
+    z-index: 9;
+}
+
+#topbar-left {
+    flex-grow: 1;
+    display: flex;
+}
+
+.topbar-tab {
+    font-size: large;
+    flex-flow: column;
+    display: block;
+    margin-right: 8px;
+    padding: 12px 24px;
+    border-radius: 3px;
+    background-color: var(--topbar-tab);
+}
+
+.topbar-tab > i {
+    margin-right: 8px;
+}
+
+.topbar-button:hover {
+    background-color: var(--topbar-tab-hover);
+    transition: background-color .1s ease;
+    cursor: pointer;
+}
+
+#topbar-filler {
+    flex-grow: 1;
+}
+
+.topbar-rightmost {
+    margin-right: 0;
+}
