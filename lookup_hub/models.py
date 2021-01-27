@@ -7,6 +7,7 @@ from simple_history.models import HistoricalRecords
 
 class Dictionary(models.Model):
     name = models.CharField(max_length=200)
+    name_display = models.CharField(max_length=200, default='')
 
     class Meta:
         verbose_name_plural = 'Dictionaries'

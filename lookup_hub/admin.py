@@ -6,6 +6,7 @@ from . import models
 @admin.register(models.Dictionary)
 class DictionaryAdmin(admin.ModelAdmin):
     list_display = (
+        'name_display',
         'name',
     )
 

@@ -70,6 +70,32 @@ a:link:hover > i {
 
 #grid-body > main {
     overflow-y: auto;
+    display: block;
+    min-width: 900px;
+    width: 80%;
+    max-width: 1300px;
+    padding: 30px;
+    margin: auto;
+}
+
+#grid-body > main h2 {
+    margin-top: 100px;
+    text-align: center;
+}
+
+#grid-body > main img {
+    display: block;
+    margin: auto;
+    max-width: 100%;
+}
+
+#grid-body > main table {
+    display: block;
+    margin: auto;
+    min-width: 600px;
+    width: 70%;
+    max-width: 1000px;
+    border-spacing: 10px;
 }
 
 .fa-large {
@@ -151,3 +177,11 @@ input[type="button"]:hover {
 .warning-button:hover {
     background-color: var(--warning-bg-hover);
 }
+
+#login-form-container {
+    display: block;
+    width: max-content;
+    max-width: 500px;
+    margin: 50px auto;
+}
+

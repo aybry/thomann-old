@@ -19,6 +19,7 @@ class HubView(LoginRequiredMixin, TemplateView):
                             many=True)
         return {
             'show_connected_tab': True,
+            'dictionary': hub_dictionary,
             'dictionary_data': dictionary_data.data,
         }
 
@@ -33,6 +34,7 @@ class SandboxView(TemplateView):
                             many=True)
         return {
             'show_connected_tab': True,
+            'dictionary': sandbox_dictionary,
             'dictionary_data': dictionary_data.data,
         }
 
