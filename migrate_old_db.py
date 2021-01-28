@@ -15,7 +15,7 @@ def main():
         for line in dict_f.readlines():
             row = json.loads(line)
             print(row)
-            if expect_category:
+            if expect_category or row['en'].get('colour') == '#0600CE':
                 if all([(row[lang]['text'] is None or
                       row[lang]['text'].strip() == '') for lang in languages]):
                     continue
@@ -37,10 +37,9 @@ def main():
                     cat_counter += 1
                     row_counter = 0
 
-            if (all([(row[lang]['text'] is None or
+            if all([(row[lang]['text'] is None or
                       row[lang]['text'].strip() == '')
-                     for lang in languages])
-                or row['en'].get('colour') == '#0600CE'):
+                     for lang in languages]):
                 expect_category = True
                 continue
             else:

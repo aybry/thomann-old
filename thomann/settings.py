@@ -42,7 +42,6 @@ INSTALLED_APPS = [
     'simple_history',
     'channels',
     'corsheaders',
-    'dark',
 ]
 
 MIDDLEWARE = [

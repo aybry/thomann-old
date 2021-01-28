@@ -1,7 +1,6 @@
 var socket;
 var currentEntry;
 
-var dummyPage = window.location.pathname == "/sandbox";
 
 
 
@@ -43,7 +42,15 @@ function startSocket() {
             insertRow(data["row_data"], data["neighbours"]);
         } else if (data["action"] == "fetched_row_data") {
             var row = new Row(data["row_data"]);
-            showEditWindow(row);
+            showEditRowWindow(row);
+        } else if (data["action"] == "insert_cat") {
+            var cat = new Category(data["cat_data"]);
+            cat.insertNewAfter(data["prev_cat_id"]);
+        } else if (data["action"] == "fetched_cat_data") {
+            var cat = new Category(data["cat_data"]);
+            showEditCatWindow(cat);
+        } else if (data["action"] == "updated_category") {
+            updateCategory(data["cat_data"]);
         } else if (data["action"] == "updated_row") {
             var row = new Row(data["row_data"]);
             removeRow(row.id);
@@ -74,7 +81,6 @@ function sockDeleteRow(rowID) {
     //     dictionary.remove(elemID);
 
     //     var data = {
-    //         dummy: dummyPage,
     //         entry_id: elemID,
     //     }
 
@@ -93,9 +99,16 @@ function sockAppendRow(catID) {
 }
 
 
+function sockInsertCat(catID) {
+    socket.send(JSON.stringify({
+        'method':'insert_new_cat',
+        'args': [catID],
+    }))
+}
+
+
 function sockGetRow(rowID) {
     var data = {
-        dummy: dummyPage,
         method: 'fetch_row_data',
         args: [rowID],
     };
@@ -104,15 +117,44 @@ function sockGetRow(rowID) {
 }
 
 
+function sockGetCaategory(catID) {
+    var data = {
+        method: 'fetch_cat_data',
+        args: [catID],
+    };
+
+    socket.send(JSON.stringify(data));
+}
+
+
 function sockUpdateRow(rowData, rowID) {
     socket.send(JSON.stringify({
-        dummy: dummyPage,
         method: "update_row",
         args: [
             rowID,
             rowData,
         ]
     }));
+}
+
+
+function sockUpdateCat(catData) {
+    socket.send(JSON.stringify({
+        method: "update_category",
+        args: [
+            catData,
+        ]
+    }));
+}
+
+
+function submitCategoryChanges() {
+    catData = {
+        id: $("#cat-id").text(),
+        name: $("#category-name").val(),
+    }
+
+    sockUpdateCat(catData);
 }
 
 
@@ -154,13 +196,37 @@ function removeRow(rowID) {
 }
 
 
-
 function getRowElementByID(rowID) {
     return $(`tr[data-row-id='${rowID}']`);
 }
 
 
-function showEditWindow(row) {
+function getTheaderElementByCatID(catID) {
+    var query = `tbody[data-cat-id="${catID}"] > tr > th.cat-header`
+    return $(query);
+}
+
+
+function getTbodyElementByCatID(catID) {
+    var query = `tbody[data-cat-id="${catID}"]`
+    return $(query);
+}
+
+
+function updateCategory(catData) {
+    var catTbody = $(getTheaderElementByCatID(catData.id));
+    catTbody.text(catData.name);
+}
+
+
+function showEditCatWindow(category) {
+    $("#cat-id").text(category.id);
+    $("#category-name").val(category.name);
+    showPopup('edit-category-form');
+}
+
+
+function showEditRowWindow(row) {
     $("#row-id").text(row.id);
     for (var cell of row.cells) {
         $(`#text-${cell.language}`).attr("data-cell-id", cell.id);

@@ -153,13 +153,19 @@ input[type="color"] {
 }
 
 
-#submit-entry-row {
-    grid-column: 2;
-    width: 100%;
+.button-row {
+    grid-column: 1 / 4;
+    display: flex;
+    justify-content: center;
+    align-items: center;
 }
 
-#submit-entry-row button {
+.button-row button {
     width: 30%;
-    display: block;
-    margin: auto;
+    margin: 0 10px;
+    font-size: large;
+}
+
+.button-row button i {
+    margin-right: 8px;
 }

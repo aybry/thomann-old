@@ -32,7 +32,7 @@ class HubConsumer(JsonWebsocketConsumer):
         method = getattr(self, data_json['method'])
         result = method(*data_json.get('args', []), **data_json.get('kwargs', {}))
 
-        if data_json['method'] in ('fetch_row_data',):
+        if data_json['method'] in ('fetch_row_data', 'fetch_cat_data',):
             self.send(json.dumps(result))
         else:
             async_to_sync(self.channel_layer.group_send)(
@@ -129,3 +129,53 @@ class HubConsumer(JsonWebsocketConsumer):
 
     def send_json(self, data):
         self.send(json.dumps(data['result']))
+
+    def fetch_cat_data(self, cat_id):
+        cat = models.Category.objects.get(pk=cat_id)
+        cat_srl = serialisers.CategoryBarebonesSerialiser(cat)
+
+        return {
+            'action': 'fetched_cat_data',
+            'cat_data': cat_srl.data,
+        }
+
+    def insert_new_cat(self, cat_id):
+        cat_clicked = models.Category.objects.get(pk=cat_id)
+        _, cat_next = cat_clicked.get_neighbours()
+
+        if cat_next is None:
+            new_order = cat_clicked.order + 1
+        else:
+            new_order = (cat_clicked.order + cat_next.order) / 2
+
+        if cat_next is not None:
+            print(f'inserting between {cat_clicked.name} ({cat_clicked.order}) and {cat_next.name} ({cat_next.order}) at {new_order}')
+        else:
+            print(f'Appending after {cat_clicked.name} (at {new_order})')
+
+        cat = models.Category(name='New Category',
+                              dictionary=models.Dictionary.objects.get(name=self.dictionary_name),
+                              order=new_order)
+        cat.save()
+
+        empty_row = models.Row(order=0, category=cat)
+        empty_row.save()
+
+        cat_srl = serialisers.CategorySerialiser(cat)
+
+        return {
+            'action': 'insert_cat',
+            'cat_data': cat_srl.data,
+            'prev_cat_id': cat.get_neighbour_ids()[0],
+        }
+
+    def update_category(self, cat_data):
+        cat = models.Category.objects.get(pk=cat_data['id'])
+
+        cat.name = cat_data['name']
+        cat.save()
+
+        return {
+            'action': 'updated_category',
+            'cat_data': serialisers.CategoryBarebonesSerialiser(cat).data,
+        }

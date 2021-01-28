@@ -50,8 +50,26 @@
 {% endblock %}
 
 {% block popups %}
+<div class="popup" id="edit-category-form">
+    <p style="display: none;">Category ID: <span id="cat-id"></span></p>
+    <p>Category name</p>
+    <p>
+        <input class="wide-input" type="text" id="category-name">
+    </p>
+
+    <div class="button-row">
+        <button id="submit-category-button">
+            <i class="fas fa-check"></i>
+            Submit
+        </button>
+        <button onclick="$('#popup-container').hide();">
+            <i class="fas fa-times"></i>
+            Cancel
+        </button>
+    </div>
+</div>
 <div class="popup" id="edit-row-cells-form">
-    <p>Row ID: <span id="row-id"></span></p>
+    <p style="display: none;">Row ID: <span id="row-id"></span></p>
     <div id="edit-entry-grid">
         <div class="edit-entry-header edit-entry-grid-elem header-de">
             DE
@@ -93,9 +111,15 @@
             <input type="color" id="colour-nl" value="#FFFFFF">
         </div>
 
-        <div id="submit-entry-row" class="button-row">
-            <button class="pure-button" id="submit-entry-button">Submit</button>
-            <button class="pure-button" onclick="$('#popup-container').hide();">Cancel</button>
+        <div class="button-row">
+            <button id="submit-row-button">
+                <i class="fas fa-check"></i>
+                Submit
+            </button>
+            <button onclick="$('#popup-container').hide();">
+                <i class="fas fa-times"></i>
+                Cancel
+            </button>
         </div>
     </div>
 </div>

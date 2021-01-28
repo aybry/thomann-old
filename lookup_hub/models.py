@@ -20,7 +20,7 @@ class Category(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     dictionary = models.ForeignKey(Dictionary, on_delete=models.CASCADE)
     name = models.CharField(max_length=200, blank=True)
-    order = models.IntegerField(default=100000)
+    order = models.FloatField()
 
     class Meta:
         verbose_name_plural = 'Categories'
@@ -28,6 +28,24 @@ class Category(models.Model):
 
     def __str__(self):
         return f'Category: {self.name}'
+
+    def get_neighbours(self):
+        ids = [str(obj['id']) for obj in Category.objects.filter(dictionary=self.dictionary).values('id')]
+        position = ids.index(str(self.id))
+
+        if len(ids) == 1:
+            return [None, None]
+        elif position == 0:
+            return [None, Category.objects.get(pk=ids[position + 1])]
+        elif position == len(ids) - 1:
+            return [Category.objects.get(pk=ids[position - 1]), None]
+        else:
+            return [Category.objects.get(pk=ids[position - 1]),
+                    Category.objects.get(pk=ids[position + 1])]
+
+    def get_neighbour_ids(self):
+        neighbours = self.get_neighbours()
+        return [str(cat.id) if cat is not None else None for cat in neighbours]
 
 
 class Row(models.Model):
@@ -85,6 +103,7 @@ class Cell(models.Model):
     text = models.CharField(max_length=200, null=True, default='')
     comment = models.CharField(max_length=2000, null=True, default='')
     colour = models.CharField(max_length=50, null=True, default='')
+    is_flagged = models.BooleanField(default=False)
 
     created_at = models.DateTimeField(auto_now_add=True, blank=True)
     updated_at = models.DateTimeField(auto_now=True, blank=True)

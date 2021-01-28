@@ -3,18 +3,23 @@ var dictionary;
 
 class Dictionary {
     constructor() {
-        this.categories = [];
+        // this.categories = [];
+        // this.idTree = {};
     }
 
-    initialise(data) {
+    initialise() {
         for (var cat of dictionaryData) {
-            // for (var i = 0; i < 10; i++) {
-                var category = new Category(cat);
-                this.categories.push(category);
-                category.makeTbody();
-            // }
+            var category = new Category(cat);
+            this.appendCategory(category);
         }
     }
+
+    appendCategory(category) {
+        // this.categories.push(category);
+        var tbody = category.makeTbodyJQ();
+        $("#hub-table").append(tbody);
+    }
+
 
     // insertDataByID(id, entry) {
     //     var index = this.ids.indexOf(id);
@@ -77,27 +82,38 @@ class Category {
     constructor(data) {
         this.id = data.id;
         this.name = data.name;
-        this.rows = this.createRows(data["row_set"]);
+
+        if (typeof(data["row_set"]) !== "undefined") {
+            // When category barebones is fetched (see serialisers)
+            this.rows = this.createRows(data["row_set"]);
+        }
     }
 
     createRows(rows) {
         var catRows = new Array();
         for (var rowData of rows) {
-            // for (var i = 0; i < 100; i++) {
-                catRows.push(new Row(rowData));
-            // }
+            catRows.push(new Row(rowData));
         }
         return catRows;
     }
 
-    makeTbody() {
+    makeTbodyJQ() {
         var container = $(this.containerHTML);
         for (var row of this.rows) {
             container.append(row.jq);
         }
         container.append(this.lastRowJQ);
         container.append($("<tr class='spacer-row'><td></td></tr>"));
-        $("#hub-table").append(container);
+        return container;
+    }
+
+
+    insertNewAfter(prevCatID) {
+        var tbody = this.makeTbodyJQ();
+        var prevTbody = getTbodyElementByCatID(prevCatID);
+        tbody.insertAfter(prevTbody);
+        print(prevCatID)
+        print('inserted')
     }
 
     get lastRowJQ() {
@@ -109,7 +125,19 @@ class Category {
                     data-row-key="-1"
                     title="Insert new row here"
                     onclick="sockAppendRow('${this.id}');">
-                    <i class="fa fa-plus-square fa-lg"></i>
+                    <i class="far fa-plus-square fa-lg"></i>
+                </button>
+            </td>
+        </tr>
+        <tr data-cat-id="${this.id}">
+            <td></td>
+            <td class="buttons-left">
+                <button
+                    class="pure-button dictionary-button"
+                    data-row-key="-1"
+                    title="Insert new category here"
+                    onclick="sockInsertCat('${this.id}');">
+                    <i class="fas fa-folder-plus fa-lg"></i>
                 </button>
             </td>
         </tr>`)
@@ -122,7 +150,7 @@ class Category {
                 <td class="filler"></td>
                 <td class="filler"></td>
                 <th colspan="3" class="cat-header">${escapeHTML(this.name)}</th>
-                ${rightButtonsHTML(self)}
+                ${rightButtonsHTMLCategory(this)}
             </tr>
         </tbody>`
     }
@@ -133,9 +161,6 @@ class Row {
     constructor(data) {
         this.id = data.id;
 
-        // print('Row')
-        // print(data)
-
         this.en = new Cell("en", data.cell_set.filter(cell => {return cell.language == "en"})[0]);
         this.de = new Cell("de", data.cell_set.filter(cell => {return cell.language == "de"})[0]);
         this.nl = new Cell("nl", data.cell_set.filter(cell => {return cell.language == "nl"})[0]);
@@ -143,18 +168,6 @@ class Row {
         this.cells = [this.en, this.de, this.nl];
 
         this.pureJSON = data;
-
-        this.comments = {
-            en: this.en.comment,
-            de: this.de.comment,
-            nl: this.nl.comment,
-        }
-
-        this.colours = {
-            en: this.en.colour,
-            de: this.de.colour,
-            nl: this.nl.colour,
-        }
     }
 
     get jq() {
@@ -165,8 +178,15 @@ class Row {
         return rowHTML(this);
     }
 
+    getattr(attribute) {
+        if (attribute === "en" ) { return this.en }
+        else if (attribute === "de" ) { return this.de }
+        else if (attribute === "nl" ) { return this.nl }
+        else { return null }
+    }
+
     commentHTML(language) {
-        var comment = this.comments[language];
+        var comment = this.getattr(language).comment;
         if ([undefined, null, ""].indexOf(comment) == -1) {
             return `
                 <span>
@@ -179,7 +199,7 @@ class Row {
     }
 
     colourHTML(language) {
-        var colour = this.colours[language];
+        var colour = this.getattr(language).colour;
         if ([undefined, null, ""].indexOf(colour) == -1) {
             if (colour.toLowerCase() != "#ffffff") {
                 return `
@@ -250,7 +270,7 @@ const leftButtonsHTML = (row) => `
             title="Delete this row"
             data-key="${ row.id }"
             onclick="sockDeleteRow('${ row.id }');">
-            <i class="fa fa-minus-square fa-lg"></i>
+            <i class="far fa-minus-square fa-lg"></i>
         </button>
     </td>
     <td class="buttons-left">
@@ -259,16 +279,16 @@ const leftButtonsHTML = (row) => `
             title="Insert new row here"
             data-key="${ row.id }"
             onclick="sockInsertRow('${ row.id }');">
-            <i class="fa fa-plus-square fa-lg"></i>
+            <i class="far fa-plus-square fa-lg"></i>
         </button>
     </td>
 `
 
 
+// data-row-id="${ row.id }">
 const dictionaryElemsHTML = (row) => `
     <td class="hub-entry text-cell de"
-        ` + row.colourHTML("de") + `
-        data-row-id="${ row.id }">
+        ` + row.colourHTML("de") + `>
         <div class="hub-entry-text"
             id="${ row.id }-de"
             data-key="${ row.id }"
@@ -278,8 +298,7 @@ const dictionaryElemsHTML = (row) => `
         ` + row.commentHTML("de") + `
     </td>
     <td class="hub-entry text-cell en"
-        ` + row.colourHTML("en") + `
-        data-row-id="${ row.id }">
+        ` + row.colourHTML("en") + `>
         <div class="hub-entry-text"
             id="${ row.id }-en"
             data-key="${ row.id }"
@@ -289,8 +308,7 @@ const dictionaryElemsHTML = (row) => `
         ` + row.commentHTML("en") + `
     </td>
     <td class="hub-entry text-cell nl"
-        ` + row.colourHTML("nl") + `
-        data-row-id="${ row.id }">
+        ` + row.colourHTML("nl") + `>
         <div class="hub-entry-text"
             id="${ row.id }-nl"
             data-key="${ row.id }"
@@ -310,7 +328,20 @@ const rightButtonsHTML = (row) => `
             title="Edit this row"
             data-key="${ row.id }"
             onclick="sockGetRow('${ row.id }');">
-            <i class="fa fa-pencil-square fa-lg"></i>
+            <i class="far fa-edit fa-lg"></i>
+        </button>
+    </td>
+    `
+
+const rightButtonsHTMLCategory = (category) => `
+    <td class="buttons-right"
+        data-row-id="${ category.id }">
+        <button
+            class="pure-button dictionary-button"
+            title="Edit this category"
+            data-key="${ category.id }"
+            onclick="sockGetCaategory('${ category.id }');">
+            <i class="fas fa-edit fa-lg"></i>
         </button>
     </td>
     `
@@ -377,14 +408,25 @@ $(document).ready( function() {
         }
     })
 
-    $("#submit-entry-button").on("click", function() {
+    $("#submit-row-button").on("click", function() {
         submitChanges();
         $("#popup-container").hide();
     })
 
     $(".edit-entry-row > input").on("keyup", function(event) {
         if (event.keyCode == 13) {
-            $("#submit-entry-button").click();
+            $("#submit-row-button").click();
+        }
+    })
+
+    $("#submit-category-button").on("click", function() {
+        submitCategoryChanges();
+        $("#popup-container").hide();
+    })
+
+    $("#category-name").on("keyup", function(event) {
+        if (event.keyCode == 13) {
+            $("#submit-category-button").click();
         }
     })
 
@@ -399,10 +441,5 @@ $(document).ready( function() {
         lastDeleteNeighbourIDs().length == lastDeleted().length
     ) {
         $("#undo-button").prop("disabled", false);
-    }
-
-    if (dummyPage) {
-        $("#dl-dict-button").attr("title", "This only works in the actual hub.");
-        $("#dl-dict-button").prop("disabled", true);
     }
 })
