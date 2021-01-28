@@ -51,7 +51,7 @@ class Category(models.Model):
 class Row(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     order = models.FloatField()
-    category = models.ForeignKey(Category, on_delete=models.SET_NULL, null=True)
+    category = models.ForeignKey(Category, on_delete=models.CASCADE)
 
     class Meta:
         unique_together = (('category', 'order'),)
