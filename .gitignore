@@ -1,7 +1,0 @@
-env
-lenovo-env
-.vscode
-launch.json
-__pycache__
-staticfiles
-db.sqlite3

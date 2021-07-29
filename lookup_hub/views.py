@@ -1,44 +1,36 @@
-from django.shortcuts import render
 from django.views.generic.base import TemplateView
 from django.contrib.auth.mixins import LoginRequiredMixin
-# from rest_framework.parsers import JSONParser
 
-from . import models, serialisers, forms
+from . import models, serialisers
+
 
 class HomeView(TemplateView):
-    template_name = 'lookup_hub/home.html'
+    template_name = "lookup_hub/home.html"
 
 
-class HubView(LoginRequiredMixin, TemplateView):
-    template_name = 'lookup_hub/hub.html'
+class DictionaryView(LoginRequiredMixin, TemplateView):
+    template_name = "lookup_hub/dictionary.html"
 
-    def get_context_data(self, **kwargs):
-        hub_dictionary = models.Dictionary.objects.get(name='hub')
-        dictionary_data = serialisers.CategorySerialiser(
-                            models.Category.objects.filter(dictionary=hub_dictionary),
-                            many=True)
+    def get_context_data(self, slug, **kwargs):
+        dictionary = models.Dictionary.objects.get(slug=slug)
+        dictionary_srl = serialisers.DictionarySerialiser(dictionary)
+
         return {
-            'show_connected_tab': True,
-            'dictionary': hub_dictionary,
-            'dictionary_data': dictionary_data.data,
+            "dictionary": dictionary,
+            "dictionary_data": dictionary_srl.data,
         }
 
 
-class SandboxView(TemplateView):
-    template_name = 'lookup_hub/hub.html'
-
+class SandboxView(DictionaryView):
     def get_context_data(self, **kwargs):
-        sandbox_dictionary = models.Dictionary.objects.get(name='sandbox')
-        dictionary_data = serialisers.CategorySerialiser(
-                            models.Category.objects.filter(dictionary=sandbox_dictionary),
-                            many=True)
+        sandbox_dictionary = models.Dictionary.objects.get(slug="sandbox")
+        dictionary_srl = serialisers.DictionarySerialiser(sandbox_dictionary)
+
         return {
-            'show_connected_tab': True,
-            'dictionary': sandbox_dictionary,
-            'dictionary_data': dictionary_data.data,
+            "dictionary": sandbox_dictionary,
+            "dictionary_data": dictionary_srl.data,
         }
 
 
 class GuideView(TemplateView):
-    template_name = 'lookup_hub/guide.html'
-
+    template_name = "lookup_hub/guide.html"

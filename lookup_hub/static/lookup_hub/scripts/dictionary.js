@@ -3,12 +3,11 @@ var dictionary;
 
 class Dictionary {
     constructor() {
-        // this.categories = [];
-        // this.idTree = {};
+        this.categories = [];
     }
 
     initialise() {
-        for (var cat of dictionaryData) {
+        for (var cat of dictionaryData["category_set"]) {
             var category = new Category(cat);
             this.appendCategory(category);
         }
@@ -103,7 +102,6 @@ class Category {
             container.append(row.jq);
         }
         container.append(this.lastRowJQ);
-        container.append($("<tr class='spacer-row'><td></td></tr>"));
         return container;
     }
 
@@ -112,17 +110,16 @@ class Category {
         var tbody = this.makeTbodyJQ();
         var prevTbody = getTbodyElementByCatID(prevCatID);
         tbody.insertAfter(prevTbody);
-        print(prevCatID)
-        print('inserted')
+        console.log(prevCatID)
+        console.log('inserted')
     }
 
     get lastRowJQ() {
         return $(`<tr data-cat-id="${this.id}">
-            <td></td>
+            <td class="no-border"></td>
             <td class="buttons-left">
                 <button
-                    class="pure-button dictionary-button"
-                    data-row-key="-1"
+                    class="pure-button dictionary-button append-row-button"
                     title="Insert new row here"
                     onclick="sockAppendRow('${this.id}');">
                     <i class="far fa-plus-square fa-lg"></i>
@@ -130,17 +127,17 @@ class Category {
             </td>
         </tr>
         <tr data-cat-id="${this.id}">
-            <td></td>
+            <td class="no-border"></td>
             <td class="buttons-left">
                 <button
                     class="pure-button dictionary-button"
-                    data-row-key="-1"
                     title="Insert new category here"
                     onclick="sockInsertCat('${this.id}');">
                     <i class="fas fa-folder-plus fa-lg"></i>
                 </button>
             </td>
-        </tr>`)
+        </tr>
+        <tr class='spacer-row'><td class='no-border'></td></tr>`)
     }
 
     get containerHTML() {
@@ -154,6 +151,10 @@ class Category {
             </tr>
         </tbody>`
     }
+
+    get brandNewJq() {
+        return $(this.containerHTML).append(this.lastRowJQ);
+    }
 }
 
 
@@ -161,11 +162,25 @@ class Row {
     constructor(data) {
         this.id = data.id;
 
-        this.en = new Cell("en", data.cell_set.filter(cell => {return cell.language == "en"})[0]);
-        this.de = new Cell("de", data.cell_set.filter(cell => {return cell.language == "de"})[0]);
-        this.nl = new Cell("nl", data.cell_set.filter(cell => {return cell.language == "nl"})[0]);
+        this.de = {};
+        this.en = {};
+        this.nl = {};
 
-        this.cells = [this.en, this.de, this.nl];
+        this.de.text = data["de_text"];
+        this.de.comment = data["de_comment"];
+        this.de.colour = data["de_colour"];
+
+        this.en.text = data["en_text"];
+        this.en.comment = data["en_comment"];
+        this.en.colour = data["en_colour"];
+
+        this.nl.text = data["nl_text"];
+        this.nl.comment = data["nl_comment"];
+        this.nl.colour = data["nl_colour"];
+
+        this.isFlagged = data["is_flagged"];
+        this.category = data["category"];
+        this.lastModified = data["updated_at"]
 
         this.pureJSON = data;
     }
@@ -189,9 +204,9 @@ class Row {
         var comment = this.getattr(language).comment;
         if ([undefined, null, ""].indexOf(comment) == -1) {
             return `
-                <span>
+                <div class="entry-comment-wrapper">
                     <i class="entry-comment fa fa-sticky-note fa-lg" title="${ escapeHTML(comment) }"></i>
-                </span>
+                </div>
             `
         } else {
             return ``
@@ -201,48 +216,10 @@ class Row {
     colourHTML(language) {
         var colour = this.getattr(language).colour;
         if ([undefined, null, ""].indexOf(colour) == -1) {
-            if (colour.toLowerCase() != "#ffffff") {
-                return `
-                    style="border: 10px; border-color: ${ colour }; border-style: none solid none none;"
-                `
-            }
+            return `style="border-right-width: 16px; border-right-color: #${ colour }; border-right-style: solid;"`
         } else {
             return ``
         }
-    }
-}
-
-
-class Cell {
-    constructor(language, data) {
-        this.language = language;
-
-        // print('Cell')
-        // print(data)
-
-        if (typeof(data) === "undefined") {
-            this.initialise();
-        } else {
-            this.id = data.id;
-            this.text = emptyIfNull(data.text);
-            this.comment = emptyIfNull(data.comment);
-            this.colour = emptyIfNull(data.colour);
-        }
-    }
-
-    getattr(attribute) {
-        if (attribute === "id") { return this.id; }
-        else if (attribute === "text") { return this.text; }
-        else if (attribute === "comment") { return this.comment; }
-        else if (attribute === "colour") { return this.colour; }
-        else { return null }
-    }
-
-    initialise() {
-        this.id = "";
-        this.text = "";
-        this.comment = "";
-        this.colour = "";
     }
 }
 
@@ -294,7 +271,7 @@ const dictionaryElemsHTML = (row) => `
             data-key="${ row.id }"
             data-target-language="de">
             ${ escapeHTML(row.de.text) }
-        </div>
+            </div>
         ` + row.commentHTML("de") + `
     </td>
     <td class="hub-entry text-cell en"
@@ -304,7 +281,7 @@ const dictionaryElemsHTML = (row) => `
             data-key="${ row.id }"
             data-target-language="en">
             ${ escapeHTML(row.en.text) }
-        </div>
+            </div>
         ` + row.commentHTML("en") + `
     </td>
     <td class="hub-entry text-cell nl"
@@ -314,39 +291,37 @@ const dictionaryElemsHTML = (row) => `
             data-key="${ row.id }"
             data-target-language="nl">
             ${ escapeHTML(row.nl.text) }
-        </div>
+            </div>
         ` + row.commentHTML("nl") + `
     </td>
     `
 
 
 const rightButtonsHTML = (row) => `
-    <td class="buttons-right"
-        data-row-id="${ row.id }">
+    <td class="buttons-right">
         <button
             class="pure-button dictionary-button"
             title="Edit this row"
             data-key="${ row.id }"
-            onclick="sockGetRow('${ row.id }');">
+            onclick="sockReadRow('${ row.id }');">
             <i class="far fa-edit fa-lg"></i>
         </button>
     </td>
     `
 
 const rightButtonsHTMLCategory = (category) => `
-    <td class="buttons-right"
-        data-row-id="${ category.id }">
+    <td class="buttons-right"">
         <button
             class="pure-button dictionary-button"
             title="Edit this category"
             data-key="${ category.id }"
-            onclick="sockGetCaategory('${ category.id }');">
+            onclick="sockReadCategory('${ category.id }');">
             <i class="fas fa-edit fa-lg"></i>
         </button>
     </td>
     `
 
-const rowHTML = (row) => `<tr data-row-id="${ row.id }">` +
+const rowHTML = (row) => `<tr class="entry-row" data-row-id="${ row.id }">` +
         leftButtonsHTML(row) +
         dictionaryElemsHTML(row) +
         rightButtonsHTML(row) +
@@ -409,7 +384,7 @@ $(document).ready( function() {
     })
 
     $("#submit-row-button").on("click", function() {
-        submitChanges();
+        submitRowChanges();
         $("#popup-container").hide();
     })
 

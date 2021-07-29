@@ -3,39 +3,25 @@ from rest_framework import serializers
 from . import models
 
 
-class CellSerialiser(serializers.ModelSerializer):
-    class Meta:
-        model = models.Cell
-        fields = (
-            'id',
-            'language',
-            'text',
-            'comment',
-            'colour',
-        )
-
-
-class CategoryBarebonesSerialiser(serializers.ModelSerializer):
-    class Meta:
-        model = models.Category
-        fields = (
-            'id',
-            'name',
-            'order',
-        )
-
-
 class RowSerialiser(serializers.ModelSerializer):
-    cell_set = CellSerialiser(many=True)
-    category = CategoryBarebonesSerialiser()
 
     class Meta:
         model = models.Row
         fields = (
-            'id',
-            'order',
-            'category',
-            'cell_set'
+            "id",
+            "category",
+            "is_flagged",
+            "created_at",
+            "updated_at",
+            "en_text",
+            "en_comment",
+            "en_colour",
+            "de_text",
+            "de_comment",
+            "de_colour",
+            "nl_text",
+            "nl_comment",
+            "nl_colour",
         )
 
 
@@ -45,8 +31,30 @@ class CategorySerialiser(serializers.ModelSerializer):
     class Meta:
         model = models.Category
         fields = (
-            'id',
-            'name',
-            'row_set',
-            'order',
+            "id",
+            "name",
+            "dictionary",
+            "row_set",
+        )
+
+
+class CategoryBarebonesSerialiser(serializers.ModelSerializer):
+    class Meta:
+        model = models.Category
+        fields = (
+            "id",
+            "name",
+            "dictionary",
+        )
+
+
+class DictionarySerialiser(serializers.ModelSerializer):
+    category_set = CategorySerialiser(many=True)
+
+    class Meta:
+        model = models.Dictionary
+        fields = (
+            "slug",
+            "name_verbose",
+            "category_set",
         )

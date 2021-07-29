@@ -1,51 +1,47 @@
 :root {
-    --text-default: rgb(179, 172, 151);
-    --page-bg: rgb(51, 50, 45);
-    --grid-elem-bg: rgb(23, 23, 18);
-    --grid-elem-header-bg: rgba(0, 0, 0, 0.4);
-    --grid-elem-header-text:rgb(168, 152, 131);
-    --grid-elem-header-border: rgb(98, 88, 81);
+    --moncom-blue: rgb(48, 67, 89);
+    --moncom-blue-hover: rgb(68, 88, 111);
+    --moncom-blue-subtle: rgb(65, 79, 95);
+    --moncom-blue-light: rgb(107, 122, 139);
+    --moncom-blue-header: rgb(45, 57, 71);
+    --moncom-blue-active: rgb(40, 78, 121);
+    --moncom-gold: rgb(238, 169, 79);
+    --moncom-gold-hover: rgb(236, 179, 104);
+    --moncom-gold-light: rgb(255, 214, 163);
+    --moncom-gold-lighter: rgb(255, 230, 199);
+    --moncom-gold-dark: rgb(206, 134, 39);
 
-    --topbar-tab: var(--page-bg);
-    --topbar-tab-hover: rgb(77, 75, 65);
-    --link: rgb(208, 144, 59);
-    --link-hover: rgb(255, 196, 119);
+    --text-default: rgb(31, 31, 31);
+    --page-bg: rgb(150, 150, 150);
+    --grid-elem-bg: rgb(200, 200, 200);
+    --menu-bg: rgba(98, 105, 117, 0.75);
+    --grid-elem-header-bg: var(--moncom-blue-header);
+    --grid-elem-header-text:rgb(242, 242, 242);
+    --grid-elem-highlight: rgb(76, 87, 100);
+    --grid-elem-shadow: rgb(46, 46, 46);
+
+    --v-v-v-slightly-darken: rgba(0, 0, 0, 0.07);
+    --v-v-slightly-darken: rgba(0, 0, 0, 0.14);
+    --v-slightly-darken: rgba(0, 0, 0, 0.17);
+    --slightly-darken: rgba(0, 0, 0, 0.19);
+    --darken: rgba(0, 0, 0, 0.25);
+    --v-v-v-slightly-lighten: rgba(255, 255, 255, 0.01);
+    --v-v-slightly-lighten: rgba(255, 255, 255, 0.14);
+    --v-slightly-lighten: rgba(255, 255, 255, 0.17);
+    --slightly-lighten: rgba(255, 255, 255, 0.2);
+    --lighten: rgba(255, 255, 255, 0.25);
+    --slightly-bluen: rgba(36, 56, 79, 0.2);
+
+    --link: rgb(16, 78, 129);
+    --link-hover: rgb(75, 131, 177);
 
     --popup-container-bg: rgba(13, 13, 13, 0.5);
-    --popup-bg: var(--page-bg);
-    --popup-border: var(--grid-elem-bg);
+    --popup-bg: rgb(196, 196, 196);
 
-    --detail-grid-box-bg: var(--page-bg);
-    --detail-grid-box-border: rgb(38, 38, 38);
-    --detail-grid-box-header-bg: rgba(0, 0, 0, 0.2);
-    --detail-grid-box-header-border: rgba(31, 31, 31, 0.1);
+    --connected: rgb(38, 95, 38);
+    --disconnected: rgb(151, 47, 73);
 
-    --object-list-box-bg: var(--page-bg);
-    --object-list-box-bg-hover: rgba(255, 255, 255, 0.12);
-    --object-list-box-header-bg-hover: rgba(0, 0, 0, 0);
-    --object-list-box-header-border: rgb(60, 56, 52);
-
-    --object-multiselect-item-bg: rgba(255, 255, 255, 0.05);
-    --object-multiselect-item-bg-hover: rgba(255, 255, 255, 0.1);
-    --object-multiselect-item-border: rgba(255, 255, 255, 0.01);
-    --object-multiselect-item-selected-bg: rgba(36, 58, 32, 0.541);
-    --object-multiselect-item-selected-bg-hover: rgba(60, 109, 51, 0.541);
-    --object-multiselect-item-selected-border: rgba(255, 255, 255, 0.05);
-
-    --button-input-select-bg: rgb(66, 65, 63);
-    --button-input-select-bg-hover: rgb(129, 125, 120);
-    --button-input-select-border: rgb(216, 171, 112);
-
-    --warning-bg: rgba(106, 9, 9, 0.45);
-    --warning-bg-hover: rgba(131, 29, 29, 0.45);
-
-    --darkred: rgb(132, 30, 30);
-    --darkgreen: rgb(90, 172, 90);
-    /* --linkblue: rgb(59, 95, 107); */
-    /* --linkblue: rgb(104, 164, 185); */
-
-}
-
-.darkred {
-    color: var(--darkred);
+    --add-row-green: green;
+    --delete-row-red: rgb(184, 0, 0);
+    --edit-row-yellow: rgb(161, 143, 40);
 }

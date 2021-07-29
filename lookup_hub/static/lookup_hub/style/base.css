@@ -1,6 +1,6 @@
 * {
     box-sizing: border-box;
-    color: var(--text-default);
+    /* color: var(--text-default); */
 }
 
 html, body {
@@ -19,22 +19,21 @@ body {
 
 a:link, a:visited,
 a:link > i, a:visited > i {
-    color: var(--link);
     text-decoration: none;
 }
 
 a:link:hover, a:hover,
 a:link:hover > i {
-    color: var(--link-hover);
     transition: background-color .1s ease;
 }
 
 #grid-container {
     display: grid;
     grid-template-columns: auto minmax(80%, 1200px) auto;
-    padding-top: 74px;
     grid-gap: 12px;
-    min-height: 86vh;
+    height: 97vh;
+    padding: 10vh 0 3vh;
+
 }
 
 #grid-container > div {
@@ -45,14 +44,8 @@ a:link:hover > i {
 #grid-body {
     grid-column: 2 / 3;
     height: 100%;
-    min-height: 80vh;
+    box-shadow: 0 0 20px 16px rgb(136, 136, 136);
 }
-
-/* #grid-footer {
-    grid-column: 2 / 3;
-    grid-row: 3 / 4;
-    padding: 10px;
-} */
 
 #grid-body > header {
     background-color: var(--grid-elem-header-bg);
@@ -62,7 +55,7 @@ a:link:hover > i {
     border-width: 1px 0 2px 0;
     padding: 8px 4px;
     text-align: center;
-    font-size: larger;
+    /* font-size: larger; */
     border-radius: 4px 4px 0 0;
     font-weight: 500;
     margin: 0;
@@ -139,22 +132,28 @@ i.right-aligned {
 	max-width: 80%;
 }
 
+
 button,
 input,
 textarea,
 select {
-    border: 0;
+    border: none;
     border-radius: 5px;
     padding: 8px 14px;
-    background-color: var(--button-input-select-bg);
+    background-color: var(--v-slightly-lighten);
     max-width: 100%;
+}
+
+input,
+textarea {
+    border: 1px solid var(--v-slightly-darken);
 }
 
 button:hover,
 input[type="submit"]:hover,
 input[type="button"]:hover {
     cursor: pointer;
-    background-color: var(--button-input-select-bg-hover);
+    background-color: var(--lighten);
     transition: background-color .1s ease;
 }
 

@@ -1,36 +1,49 @@
 {% extends "lookup_hub/base.html" %}
 {% load static %}
 
-{% block title %}Lookup Hub{% endblock %}
+
+{% block title %}Dictionary: {{ dictionary.name_verbose }}{% endblock %}
+
 
 {% block stylesheets %}
-    <link rel="stylesheet" href="{% static 'lookup_hub/style/hub.css' %}">
+<link rel="stylesheet" href="{% static 'lookup_hub/style/hub.css' %}?{% now ''='u' %}">
 {% endblock %}
+
+
+{% block header_scripts %}
+<script type="application/javascript">
+    const socketType = window.location.protocol === "https:" ? "wss" : "ws";
+    const portNumber = socketType === "wss" ? ":7999" : ":8000";
+</script>
+{{ dictionary_data|json_script:"dictionary-data" }}
+<script>
+    const dictionaryData = JSON.parse(document.getElementById('dictionary-data').textContent);
+</script>
+{% endblock %}
+
 
 {% block scripts %}
-    <script src="{% static 'lookup_hub/scripts/socket.js' %}"></script>
-    <script src="{% static 'lookup_hub/scripts/dictionary.js' %}"></script>
-    {{ dictionary_data|json_script:"dictionary-data" }}
-    <script>
-        const dictionaryData = JSON.parse(document.getElementById('dictionary-data').textContent);
-    </script>
-
+<script src="{% static 'lookup_hub/scripts/dictionary.js' %}?{% now 'v=u' %}"></script>
+<script src="{% static 'lookup_hub/scripts/rowSocket.js' %}?{% now 'v=u' %}"></script>
+<script src="{% static 'lookup_hub/scripts/catSocket.js' %}?{% now 'v=u' %}"></script>
 {% endblock %}
+
 
 {% block right_buttons %}
     <div class="navigator-button-right">
-        <button class="pure-button" id="undo-button"
+        <!-- <button class="pure-button" id="undo-button"
             title="Re-add the last row you deleted."
-            onclick="dictionary.undo();" disabled>Undo last delete</button>
-        <button class="pure-button" id="dl-dict-button"
+            onclick="dictionary.undo();" disabled>Undo last delete</button> -->
+        <!-- <button class="pure-button" id="dl-dict-button"
             title="If you've made a few changes, download the current dictionary and keep it, just in case Sam screws up and we lose data. (He promises to try not to.)"
-            >Download dictionary</button>
-        <div class="pure-button" id="socket-status" onclick="startSocket();" disabled>Waiting...</div>
+            >Download dictionary</button> -->
+        <!-- <div class="pure-button" id="socket-status" onclick="startSocket();" disabled>Waiting...</div> -->
     </div>
 {% endblock %}
 
+
 {% block body %}
-    <header>{{ dictionary.name_display }}</header>
+    <!-- <header>{{ dictionary.name_display }}</header> -->
     <table id="hub-table">
         <thead class="grid-elem de">
             <th></th>
@@ -49,13 +62,15 @@
     </table>
 {% endblock %}
 
+
 {% block popups %}
 <div class="popup" id="edit-category-form">
-    <p style="display: none;">Category ID: <span id="cat-id"></span></p>
-    <p>Category name</p>
-    <p>
-        <input class="wide-input" type="text" id="category-name">
-    </p>
+    <div id="cat-name-row">
+        <div>Category name:</div>
+        <div class="input-wrapper">
+            <input class="wide-input" type="text" id="category-name">
+        </div>
+    </div>
 
     <div class="button-row">
         <button id="submit-category-button">
@@ -67,9 +82,10 @@
             Cancel
         </button>
     </div>
-</div>
+
+    <div class="id-row">Category ID: <span id="cat-id"></span></div>
+    </div>
 <div class="popup" id="edit-row-cells-form">
-    <p style="display: none;">Row ID: <span id="row-id"></span></p>
     <div id="edit-entry-grid">
         <div class="edit-entry-header edit-entry-grid-elem header-de">
             DE
@@ -121,6 +137,8 @@
                 Cancel
             </button>
         </div>
+
+        <div class="id-row">Row ID: <span id="row-id"></span></div>
     </div>
 </div>
 {% endblock %}
